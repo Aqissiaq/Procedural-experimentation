@@ -11,6 +11,8 @@ public class L_Algae : MonoBehaviour {
     public List<Alphabet> globalInput;
     public GameObject voxel;
 
+    int counter = 0;
+
 
     void Start()
     {
@@ -25,8 +27,10 @@ public class L_Algae : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.L))
         {
-            gameObject.transform.Translate(new Vector3(voxelSize, 0, 0));
-            LSystemChange(globalInput);
+            for (int i = 0; i < iterations; i++)
+            {
+                LSystemChange(globalInput);
+            }
         }
     }
 
@@ -35,7 +39,7 @@ public class L_Algae : MonoBehaviour {
     // X → F−[[X]+X]+F[+FX]−X), (F → FF) where F is draw forward, + and - correspond to rotation and ][ stores and restores variables
 
 
-    public void Growth(List<Alphabet> input, Vector3 inPos)
+ public void Growth(List<Alphabet> input, Vector3 inPos)
     {
         Vector3 currentLocation = inPos;
         Vector3 pushLocation = Vector3.zero;
@@ -48,22 +52,23 @@ public class L_Algae : MonoBehaviour {
                 case (Alphabet.F):
                     //draw forward
                     GameObject o = GameObject.Instantiate(voxel);
-                    o.transform.position = currentLocation;
-                    o.transform.rotation = currentRotation;
-                    currentLocation += o.transform.forward * voxelSize;
+                    o.transform.position = pushLocation;
+                    o.transform.rotation = pushRotation;
+                    currentLocation += o.transform.up * voxelSize;
                     break;
 
                 case (Alphabet.X):
+                    //currentLocation += Vector3.up * voxelSize;
                     break;
 
                 case (Alphabet.min):
                     //increase angle
-                    currentRotation = Quaternion.AngleAxis(angleChange, Vector3.right) * currentRotation;
+                        currentRotation = Quaternion.AngleAxis(angleChange, Vector3.right) * currentRotation;
                     break;
 
                 case (Alphabet.plus):
                     //decrease angle
-                    currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.right) * currentRotation;
+                        currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.right) * currentRotation;
                     break;
 
                 case (Alphabet.push):
@@ -83,6 +88,77 @@ public class L_Algae : MonoBehaviour {
             }
         }
     }
+
+
+    /*public IEnumerator Growth(List<Alphabet> input, Vector3 inPos)
+    {
+        int count = input.Count;
+        Vector3 currentLocation = inPos;
+        Vector3 pushLocation = Vector3.zero;
+        Quaternion currentRotation = Quaternion.identity;
+        Quaternion pushRotation = Quaternion.identity;
+        while (counter < count)
+        {
+            counter++;
+            switch (input[counter])
+            {
+                case (Alphabet.F):
+                    //draw forward
+                    GameObject o = GameObject.Instantiate(voxel);
+                    o.transform.position = pushLocation;
+                    o.transform.rotation = pushRotation;
+                    currentLocation += o.transform.up * voxelSize;
+                    break;
+
+                case (Alphabet.X):
+                    //currentLocation += Vector3.up * voxelSize;
+                    break;
+
+                case (Alphabet.min):
+                    //increase angle
+                    int choice = Random.Range(0, 1);
+                    if (choice == 0)
+                    {
+                        currentRotation = Quaternion.AngleAxis(angleChange, Vector3.right) * currentRotation;
+                    }
+                    else if (choice == 1)
+                    {
+                        currentRotation = Quaternion.AngleAxis(angleChange, Vector3.back) * currentRotation;
+                    }
+                    break;
+
+                case (Alphabet.plus):
+                    //decrease angle
+                    choice = Random.Range(0, 1);
+                    if (choice == 0)
+                    {
+                        currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.right) * currentRotation;
+                    }
+                    else if (choice == 1)
+                    {
+                        currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.back) * currentRotation;
+                    }
+                    break;
+
+                case (Alphabet.push):
+                    pushRotation = currentRotation;
+                    pushLocation = currentLocation;
+                    break;
+
+                case (Alphabet.pop):
+                    currentLocation = pushLocation;
+                    currentRotation = pushRotation;
+                    break;
+
+
+                default:
+                    Debug.Log("No?");
+                    break;
+            }
+            yield return null;
+        }
+    }*/
+
 
     public void LSystemChange(List<Alphabet> input)
     {
