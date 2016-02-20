@@ -12,6 +12,9 @@ public class L_Algae : MonoBehaviour {
     public GameObject voxel;
 
     int counter = 0;
+    Vector3 pushLocation = Vector3.zero;
+    Quaternion currentRotation = Quaternion.identity;
+    Quaternion pushRotation = Quaternion.identity;
 
 
     void Start()
@@ -42,9 +45,6 @@ public class L_Algae : MonoBehaviour {
  public void Growth(List<Alphabet> input, Vector3 inPos)
     {
         Vector3 currentLocation = inPos;
-        Vector3 pushLocation = Vector3.zero;
-        Quaternion currentRotation = Quaternion.identity;
-        Quaternion pushRotation = Quaternion.identity;
         for (int i = 0; i < input.Count; i++)
         {
             switch (input[i])
@@ -52,8 +52,8 @@ public class L_Algae : MonoBehaviour {
                 case (Alphabet.F):
                     //draw forward
                     GameObject o = GameObject.Instantiate(voxel);
-                    o.transform.position = pushLocation;
-                    o.transform.rotation = pushRotation;
+                    o.transform.position = currentLocation;
+                    o.transform.rotation = currentRotation;
                     currentLocation += o.transform.up * voxelSize;
                     break;
 
@@ -64,11 +64,13 @@ public class L_Algae : MonoBehaviour {
                 case (Alphabet.min):
                     //increase angle
                         currentRotation = Quaternion.AngleAxis(angleChange, Vector3.right) * currentRotation;
+                        currentRotation = Quaternion.AngleAxis(angleChange, Vector3.forward) * currentRotation;
                     break;
 
                 case (Alphabet.plus):
                     //decrease angle
                         currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.right) * currentRotation;
+                        currentRotation = Quaternion.AngleAxis(-angleChange, Vector3.forward) * currentRotation;
                     break;
 
                 case (Alphabet.push):
@@ -159,7 +161,7 @@ public class L_Algae : MonoBehaviour {
         }
     }*/
 
-
+    // X → F−[[X]+X]+F[+FX]−X), (F → FF) where F is draw forward, + and - correspond to rotation and ][ stores and restores variables
     public void LSystemChange(List<Alphabet> input)
     {
         List<Alphabet> replaceString = new List<Alphabet>();
@@ -188,8 +190,6 @@ public class L_Algae : MonoBehaviour {
                     replaceString.Add(Alphabet.pop);
                     replaceString.Add(Alphabet.min);
                     replaceString.Add(Alphabet.X);
-
-
                     break;
 
                 case (Alphabet.F):
