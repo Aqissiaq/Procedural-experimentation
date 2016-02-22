@@ -10,6 +10,8 @@ public class VoxelTree0 : MonoBehaviour {
     public int minHeight;
     public int maxHeight;
 
+    public int trunkDiverge;
+
     public int minBranches;
     public int maxBranches;
 
@@ -29,9 +31,8 @@ public class VoxelTree0 : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.T))
         {
             TrunkGrower(transform.position);
-            LeafGrower(endLeaves);
             endLeaves.Clear();
-            transform.Translate(new Vector3(20, 0, 0));
+            transform.Translate(new Vector3(25, 0, 0));
         }
     }
 
@@ -39,23 +40,27 @@ public class VoxelTree0 : MonoBehaviour {
     {
         //randomize parameters
         int trunkHeight = Random.Range(minHeight, maxHeight + 1);
+        int zDisp = Random.Range(-trunkDiverge, trunkDiverge);
+        int xDisp = Random.Range(-trunkDiverge, trunkDiverge);
+
+        //define trunk vector
+        Vector3 trunkVector = new Vector3(xDisp, trunkHeight, zDisp);
 
         //grow trunk
-        for (int i = 0; i < trunkHeight; i++)
+        for (int i = 0; i < trunkVector.magnitude; i++)
         {
-            Vector3 drawPos = new Vector3(startPos.x, startPos.y + (i), startPos.z);
-            GameObject trunkPiece = Instantiate(trunkVoxel, drawPos, Quaternion.identity) as GameObject;
-            trunkPiece.transform.rotation = Quaternion.Euler(new Vector3(0, Random.Range(0, 360), 0));
+            Vector3 drawPos = startPos + trunkVector * i / trunkVector.magnitude;
+            Instantiate(trunkVoxel, drawPos, Quaternion.identity);
         }
         //add trunk end to list of branch ends
-        endLeaves.Add(startPos + Vector3.up * trunkHeight);
+        endLeaves.Add(startPos + trunkVector);
 
         //grow branches
-        BranchGrower(startPos, trunkHeight);
+        BranchGrower(trunkVector, startPos);
     }
 
 
-    public void BranchGrower(Vector3 trunkBase, int trunkHeight)
+    public void BranchGrower(Vector3 trunkVector, Vector3 trunkPos)
     {
         //randomize parameters
         int branchNumber = Random.Range(minBranches, maxBranches + 1);
@@ -64,8 +69,8 @@ public class VoxelTree0 : MonoBehaviour {
         //find random locations for branches (may need weighting)
         for (int i = 0; i < branchNumber; i++)
         {
-            int randomizer = Random.Range(3, trunkHeight);
-            Vector3 branchLocation = trunkBase + Vector3.up * randomizer;
+            float randomizer = Random.Range(.3f, 1);
+            Vector3 branchLocation = trunkPos + trunkVector * randomizer;
             branchLocations.Add(branchLocation);
         }
 
@@ -88,6 +93,9 @@ public class VoxelTree0 : MonoBehaviour {
                 Instantiate(trunkVoxel, drawPos, Quaternion.identity);
             }
         }
+
+        //grow leaves
+        LeafGrower(endLeaves);
     }
 
     public void LeafGrower(List<Vector3> leafLocations)
@@ -98,6 +106,7 @@ public class VoxelTree0 : MonoBehaviour {
         }
     }
 
+    //terrible voxel "sphere"
     void FillSphere(Vector3 origin, GameObject voxel, float radius, int fill)
     {
         float r = radius * radius;
