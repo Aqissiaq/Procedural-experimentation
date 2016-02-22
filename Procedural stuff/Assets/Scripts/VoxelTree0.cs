@@ -6,6 +6,8 @@ public class VoxelTree0 : MonoBehaviour {
 
     public GameObject trunkVoxel;
     public GameObject leafVoxel;
+    public GameObject leafVoxel2;
+    public GameObject leafVoxel3;
 
     public int minHeight;
     public int maxHeight;
@@ -32,10 +34,22 @@ public class VoxelTree0 : MonoBehaviour {
         {
             TrunkGrower(transform.position);
             endLeaves.Clear();
-            transform.Translate(new Vector3(25, 0, 0));
+            transform.Translate(new Vector3(Random.Range(-25, 25), 0, Random.Range(-25, 25)));
+            //StartCoroutine(ForestGrower());
         }
     }
 
+    public IEnumerator ForestGrower()
+    {
+        while (Time.time < Mathf.Infinity)
+        {
+            TrunkGrower(transform.position);
+            endLeaves.Clear();
+            transform.Translate(new Vector3(Random.Range(-25, 25), 0, Random.Range(-25, 25)));
+            yield return null;
+        }
+        yield return null;
+    }
     public void TrunkGrower(Vector3 startPos)
     {
         //randomize parameters
@@ -103,6 +117,8 @@ public class VoxelTree0 : MonoBehaviour {
         for (int i = 0; i < leafLocations.Count; i++)
         {
             FillSphere(leafLocations[i], leafVoxel, Random.Range(minLeaves, maxLeaves), leafDensity);
+            FillSphere(leafLocations[i], leafVoxel2, Random.Range(minLeaves, maxLeaves), leafDensity);
+            FillSphere(leafLocations[i], leafVoxel3, Random.Range(minLeaves, maxLeaves), leafDensity);
         }
     }
 
